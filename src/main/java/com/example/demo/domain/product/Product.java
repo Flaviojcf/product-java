@@ -1,10 +1,11 @@
 package com.example.demo.domain.product;
 
+import com.example.demo.domain.DTO.RequestProductDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Table(name="product")
-@Entity(name="product")
+@Table(name = "product")
+@Entity(name = "product")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -12,10 +13,16 @@ import lombok.*;
 @EqualsAndHashCode(of = "id")
 public class Product {
 
-    @Id @GeneratedValue(strategy = GenerationType.UUID)
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     private String name;
 
-    private  Number price_in_cents;
+    private Integer price_in_cents;
+
+    public Product(RequestProductDTO requestProductDTO) {
+        this.name = requestProductDTO.name();
+        this.price_in_cents = requestProductDTO.price_in_cents();
+    }
 }
