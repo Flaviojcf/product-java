@@ -21,7 +21,7 @@ public class ProductsController {
     @GetMapping
     public ResponseEntity GetAllProducts(){
 
-        var productL = _productRepository.findAll();
+        var productL = _productRepository.findAllByActiveTrue();
 
         return ResponseEntity.ok(productL);
 
@@ -44,6 +44,23 @@ public class ProductsController {
             product.setName(requestProductDTO.name());
             product.setPrice_in_cents(requestProductDTO.price_in_cents());
             return ResponseEntity.ok(product);
+        } else {
+            return ResponseEntity.notFound().build();
+
+        }
+    };
+
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity DeleteProduct(@PathVariable String id) {
+
+        Optional<Product> optionalProduct = _productRepository.findById(id);
+
+        if (optionalProduct.isPresent()){
+            Product product = optionalProduct.get();
+            product.setActive(false);
+            return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();
 
