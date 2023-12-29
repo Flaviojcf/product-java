@@ -3,6 +3,7 @@ package com.example.demo.controllers;
 import com.example.demo.domain.DTO.RequestProductDTO;
 import com.example.demo.domain.product.Product;
 import com.example.demo.domain.product.ProductRepository;
+import com.example.demo.domain.services.ProductsService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +18,12 @@ import java.util.Optional;
 public class ProductsController {
 
     @Autowired
-    private ProductRepository _productRepository;
+    private ProductsService _productService;
 
     @GetMapping
     public ResponseEntity GetAllProducts(){
 
-        var productL = _productRepository.findAllByActiveTrue();
+        var productL = _productService.GetAllProducts();
 
         return ResponseEntity.ok(productL);
 
@@ -31,24 +32,21 @@ public class ProductsController {
     @PostMapping
     public ResponseEntity CreateProduct(@RequestBody @Valid RequestProductDTO requestProductDTO){
         Product newProduct =  new Product(requestProductDTO);
-        _productRepository.save(newProduct);
+        _productService.CreateProduct(newProduct);
         return ResponseEntity.ok(newProduct);
     };
 
     @PutMapping
     @Transactional
     public ResponseEntity UpdateProduct(@RequestBody @Valid RequestProductDTO requestProductDTO){
-        Optional<Product> optionalProduct = _productRepository.findById(requestProductDTO.id());
+        Product product = _productService.UpdateProduct(requestProductDTO);
 
-        if (optionalProduct.isPresent()){
-            Product product = optionalProduct.get();
-            product.setName(requestProductDTO.name());
-            product.setPrice_in_cents(requestProductDTO.price_in_cents());
+        if (product != null){
             return ResponseEntity.ok(product);
         } else {
             return ResponseEntity.notFound().build();
-
         }
+
     };
 
 
@@ -56,14 +54,13 @@ public class ProductsController {
     @Transactional
     public ResponseEntity DeleteProduct(@PathVariable String id) {
 
-        Optional<Product> optionalProduct = _productRepository.findById(id);
+        Product product = _productService.DeleteProduct(id);
 
-        if (optionalProduct.isPresent()){
-            Product product = optionalProduct.get();
-            product.setActive(false);
-            return ResponseEntity.noContent().build();
+        if (product != null){
+            return ResponseEntity.ok(product);
         } else {
-            throw  new EntityNotFoundException();
+            return ResponseEntity.notFound().build();
         }
+
     };
 }
