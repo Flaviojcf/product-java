@@ -3,6 +3,7 @@ package com.example.demo.controllers;
 import com.example.demo.domain.DTO.RequestProductDTO;
 import com.example.demo.domain.product.Product;
 import com.example.demo.domain.product.ProductRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -62,8 +63,7 @@ public class ProductsController {
             product.setActive(false);
             return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.notFound().build();
-
+            throw  new EntityNotFoundException();
         }
     };
 }
